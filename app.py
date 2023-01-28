@@ -7,7 +7,6 @@ import numpy as np
 valid_login = st.secrets["VALID_LOGIN"]
 valid_password = st.secrets["VALID_PASSWORD"]
 
-## LOGIN PART ##
 def check_password():
     """Returns `True` if the user had the correct password."""
 
@@ -37,15 +36,16 @@ def check_password():
         st.text_input(
             "Password", type="password", on_change=password_entered, key="password"
         )
-        st.error("😕 Username/password is incorrect")
+        st.error("😕 Identifiants incorrects, veuillez réessayer")
         return False
     else:
         # Password correct.
         return True
 
+# st.session_state["datai"] = {}
+
 if check_password():
 
-    ## APPLICATION PART ##
     img1 = Image.open('image4.jpg')
     img1 = img1.resize((600, 200))
     st.image(img1, use_column_width=False)
@@ -73,7 +73,7 @@ if check_password():
     emp = st.selectbox("Travailleur indépendant", emp_display)
 
     # For Property status
-    prop_display = ('Rural', 'Semi-Urban', 'Urban')
+    prop_display = ('Rural', 'Semiurban', 'Urban')
     prop = st.selectbox("Zone d'habitation", prop_display)
 
     # Applicant Monthly Income
@@ -85,8 +85,10 @@ if check_password():
 
     # Co-Applicant Monthly Income
     co_mon_income = float(st.number_input("Revenues co-demandeur", value=0))
+
     # Loan AMount
     loan_amt = float(st.number_input("Montant du credit", value=0))
+
     # loan duration
     dur = float(st.number_input("Durée du credit", value=0))
 
@@ -119,9 +121,15 @@ if check_password():
         proba_no_class = round(proba[0][0], 2) * 100
 
         if pred == "Y":
-            st.success(f"Le demandeur est eligble au credit avec un indicateur de confiance de {int(proba_yes_class)} %")
+            st.success(f"Le demandeur est éligble au credit avec un indicateur de confiance de {int(proba_yes_class)} %")
         else:
-            st.warning(f"Le demandeur n'est pas eligble au credit avec un indicateur de confiance de {int(proba_no_class)} %")
-            
+            st.warning(f"Le demandeur n'est pas éligble au credit avec un indicateur de confiance de {int(proba_no_class)} %")
+        
+        # Ajout de la prédiction au tableau de l'utilisateur
+        df["LoanStatus"] = pred
 
-
+        # Télécharge la prediction
+        st.download_button("Télécharger les données d'utilisateur",
+                            df.to_csv(index=False).encode('utf-8'),
+                            "User_data.csv",
+                            "text/csv")

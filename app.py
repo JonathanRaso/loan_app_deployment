@@ -9,7 +9,7 @@ valid_password = st.secrets["VALID_PASSWORD"]
 
 ## Fonctions ##
 def loading_model():
-    infile = open('./models/model_2.pkl','rb')
+    infile = open('./model.pkl','rb')
     model = pickle.load(infile)
     infile.close()
     return model

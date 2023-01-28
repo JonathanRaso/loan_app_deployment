@@ -2,10 +2,31 @@ import streamlit as st
 from PIL import Image
 import pickle
 import pandas as pd
-import numpy as np
 
+## Variables d'environnement (secrets sur streamlit cloud) ##
 valid_login = st.secrets["VALID_LOGIN"]
 valid_password = st.secrets["VALID_PASSWORD"]
+
+## Fonctions ##
+def loading_model():
+    infile = open('./models/model_2.pkl','rb')
+    model = pickle.load(infile)
+    infile.close()
+    return model
+
+def create_user_dataframe(data):
+        COLUMNS_NAMES = ['Gender', 'Married', 'Dependents', 'Education',
+                         'Self_Employed', 'ApplicantIncome', 'CoapplicantIncome', 'LoanAmount',
+                         'Loan_Amount_Term', 'Credit_History', 'Property_Area']
+
+        if data[-2] == "Yes":
+            data[-2]  = 1.0
+        if data[-2]  == "No":
+            data[-2]  = 0.0
+
+        df = pd.DataFrame([data], columns=COLUMNS_NAMES)
+
+        return df
 
 def check_password():
     """Returns `True` if the user had the correct password."""
@@ -42,10 +63,10 @@ def check_password():
         # Password correct.
         return True
 
-# st.session_state["datai"] = {}
-
+## Login ##
 if check_password():
 
+    ## Application ##
     img1 = Image.open('image4.jpg')
     img1 = img1.resize((600, 200))
     st.image(img1, use_column_width=False)
@@ -95,24 +116,12 @@ if check_password():
     ## ----------------------------------------------------- ## 
 
     if st.button("Demande de crédit"):
-        ## --- TRAITEMENT DES DONNEES --- ##
-        infile = open('./model.pkl','rb')
-        model = pickle.load(infile)
-        infile.close()
-
-        COLUMNS_NAMES = ['Gender', 'Married', 'Dependents', 'Education',
-        'Self_Employed', 'ApplicantIncome', 'CoapplicantIncome', 'LoanAmount',
-        'Loan_Amount_Term', 'Credit_History', 'Property_Area']
-
-        if credit_history == "Yes":
-            credit_history = 1.0
-        if credit_history == "No":
-            credit_history = 0.0
+        model = loading_model()
 
         data = [gen, mar, dep, edu, emp, mon_income, 
                 co_mon_income, loan_amt, dur, credit_history, prop]
 
-        df = pd.DataFrame([data], columns=COLUMNS_NAMES)
+        df = create_user_dataframe(data)
         
         ## --- PREDICTION --- ##
         pred = model.predict(df)

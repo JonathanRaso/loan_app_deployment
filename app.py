@@ -4,9 +4,10 @@ import pickle
 import pandas as pd
 import numpy as np
 
-valid_login = "login"
-valid_password = "password"
+valid_login = st.secrets["VALID_LOGIN"]
+valid_password = st.secrets["VALID_PASSWORD"]
 
+## LOGIN PART ##
 def check_password():
     """Returns `True` if the user had the correct password."""
 
@@ -44,6 +45,7 @@ def check_password():
 
 if check_password():
 
+    ## APPLICATION PART ##
     img1 = Image.open('image4.jpg')
     img1 = img1.resize((600, 200))
     st.image(img1, use_column_width=False)
